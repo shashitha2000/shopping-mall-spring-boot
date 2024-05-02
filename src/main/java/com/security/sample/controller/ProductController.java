@@ -1,18 +1,27 @@
 package com.security.sample.controller;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.security.sample.dto.FeedbackDto;
 import com.security.sample.entity.Feedback;
 import com.security.sample.entity.Product;
 import com.security.sample.service.FeedbackService;
 import com.security.sample.service.ProductService;
 import com.security.sample.util.StandardResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -57,15 +66,16 @@ public class ProductController {
         );
     }
 
-    //ADMIN
-    @DeleteMapping(
-            path={"/delete-product/{id}"}
-    )
-    public String deleteProduct( @PathVariable(value = "id") long id) throws ChangeSetPersister.NotFoundException {
-
-        boolean product=productService.productDelete(id);
-        return "deleted";
+//ADMIN
+@DeleteMapping(path={"/delete-product/{id}"})
+public ResponseEntity<?> deleteProduct(@PathVariable(value = "id") long id) throws ChangeSetPersister.NotFoundException {
+    boolean productDeleted = productService.productDelete(id);
+    if (productDeleted) {
+        return ResponseEntity.ok().build(); // Return 200 OK status for successful deletion
+    } else {
+        return ResponseEntity.notFound().build(); // Return 404 Not Found status if product was not found
     }
+}
 
 
     //--------------------------------------------------------------FEEDBACK
